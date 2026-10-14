@@ -1,0 +1,22 @@
+# systemd *user* unit: apply a ge66-light profile at login.
+#
+# Install by hand (nothing in this repository does it for you):
+#   mkdir -p ~/.config/systemd/user ~/.config/ge66-light ~/.local/bin
+#   cp contrib/ge66-light.service ~/.config/systemd/user/
+#   cp contrib/profile.example.json ~/.config/ge66-light/profile.json
+#   ln -s "$PWD/ge66-light" ~/.local/bin/ge66-light      # the script resolves its own location
+#   systemctl --user daemon-reload && systemctl --user enable --now ge66-light.service
+#
+# The hidraw nodes must be readable by your user (udev rule with TAG+="uaccess").
+# Flash is only written if the profile itself sets "persist": true (default false).
+[Unit]
+Description=Apply GE66 lighting profile (light bar and keyboard)
+
+[Service]
+Type=oneshot
+# --wait retries device discovery for a while: USB HID devices can enumerate after the session starts
+ExecStart=%h/.local/bin/ge66-light apply --wait 30 %h/.config/ge66-light/profile.json
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "name": "example",
+  "description": "Rainbow wave on the light bar, blue keyboard with white WASD.",
+  "persist": false,
+  "lightbar": {
+    "color_scale": "ffff99",
+    "brightness": 255,
+    "lighting": {
+      "type": "effect",
+      "effect": {
+        "kind": "colorshift",
+        "colors": "rainbow",
+        "speed": 400,
+        "direction": "horizontal",
+        "focal": [0, 0],
+        "scale": 40
+      }
+    }
+  },
+  "keyboard": {
+    "color_scale": [140, 204, 153],
+    "lighting": {
+      "type": "static",
+      "color": "0000ff",
+      "set": { "w,a,s,d": "ffffff", "esc": "ff0000" }
+    }
+  }
+}

@@ -1,0 +1,83 @@
+diff --git a/Controllers/SteelSeriesController/SteelSeriesControllerDetect.cpp b/Controllers/SteelSeriesController/SteelSeriesControllerDetect.cpp
+index e37fd74..1465c3e 100644
+--- a/Controllers/SteelSeriesController/SteelSeriesControllerDetect.cpp
++++ b/Controllers/SteelSeriesController/SteelSeriesControllerDetect.cpp
+@@ -18,6 +18,8 @@
+ #include "SteelSeriesApexController.h"
+ #include "SteelSeriesApexMController.h"
+ #include "SteelSeriesApexTZoneController.h"
++#include "SteelSeriesMSIGE66KeyboardController.h"
++#include "SteelSeriesMSIGE66LightBarController.h"
+ #include "SteelSeriesOldApexController.h"
+ #include "SteelSeriesQCKMatController.h"
+ #include "SteelSeriesRivalController.h"
+@@ -27,6 +29,8 @@
+ #include "RGBController_SteelSeriesArctis5.h"
+ #include "RGBController_SteelSeriesApex.h"
+ #include "RGBController_SteelSeriesApex3.h"
++#include "RGBController_SteelSeriesMSIGE66Keyboard.h"
++#include "RGBController_SteelSeriesMSIGE66LightBar.h"
+ #include "RGBController_SteelSeriesOldApex.h"
+ #include "RGBController_SteelSeriesQCKMat.h"
+ #include "RGBController_SteelSeriesRival.h"
+@@ -105,6 +109,12 @@
+ #define STEELSERIES_QCK_PRISM_CLOTH_5XL_PID                       0x151A
+ #define STEELSERIES_QCK_PRISM_CLOTH_XL_DESTINY_2_LIGHTFALL_ED_PID 0x1520
+ 
++/*-----------------------------------------------------*\
++| MSI GE66 Raider light bar and keyboard product IDs    |
++\*-----------------------------------------------------*/
++#define STEELSERIES_MSI_GE66_LIGHT_BAR_PID          0x1132
++#define STEELSERIES_MSI_GE66_KEYBOARD_PID           0x1122
++
+ /*-----------------------------------------------------*\
+ | Keyboard product IDs                                  |
+ \*-----------------------------------------------------*/
+@@ -436,6 +446,37 @@ void DetectSteelSeriesArctis5(hid_device_info* info, const std::string& name)
+     }
+ }
+ 
++void DetectSteelSeriesMSIGE66LightBar(hid_device_info* info, const std::string& name)
++{
++    hid_device* dev = hid_open_path(info->path);
++
++    if(dev)
++    {
++        SteelSeriesMSIGE66LightBarController*     controller     = new SteelSeriesMSIGE66LightBarController(dev, info->path, name);
++        RGBController_SteelSeriesMSIGE66LightBar* rgb_controller = new RGBController_SteelSeriesMSIGE66LightBar(controller);
++
++        ResourceManager::get()->RegisterRGBController(rgb_controller);
++    }
++}
++
++/*---------------------------------------------------------*\
++| The GE66 keyboard uses element tables for its firmware    |
++| modes and a host stream setup for Direct mode. Tested on  |
++| a GE66 Raider 10SGS with keyboard firmware 2.36.          |
++\*---------------------------------------------------------*/
++void DetectSteelSeriesMSIGE66Keyboard(hid_device_info* info, const std::string& name)
++{
++    hid_device* dev = hid_open_path(info->path);
++
++    if(dev)
++    {
++        SteelSeriesMSIGE66KeyboardController*     controller     = new SteelSeriesMSIGE66KeyboardController(dev, info->path, name);
++        RGBController_SteelSeriesMSIGE66Keyboard* rgb_controller = new RGBController_SteelSeriesMSIGE66Keyboard(controller);
++
++        ResourceManager::get()->RegisterRGBController(rgb_controller);
++    }
++}
++
+ /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------*\
+ | Mice                                                                                                                                                                      |
+ \*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+@@ -523,3 +564,9 @@ REGISTER_HID_DETECTOR_I  ("SteelSeries Apex M750",                          Dete
+ REGISTER_HID_DETECTOR_I  ("SteelSeries Apex (OG)/Apex Fnatic",              DetectSteelSeriesApexOld,   STEELSERIES_VID, STEELSERIES_APEX_OG_PID,                   	0  );
+ REGISTER_HID_DETECTOR_I  ("SteelSeries Apex 350",                           DetectSteelSeriesApexOld,   STEELSERIES_VID, STEELSERIES_APEX_350_PID,                      0  );
+ REGISTER_HID_DETECTOR_I  ("SteelSeries Apex Pro 3",                         DetectSteelSeriesApex,      STEELSERIES_VID, STEELSERIES_APEX_PRO3_PID,                     1  );
++
++/*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------*\
++| MSI GE66 Raider light bar (SteelSeries ALC) and keyboard (SteelSeries KLC)                                                                                                |
++\*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
++REGISTER_HID_DETECTOR_IPU("MSI GE66 Raider Light Bar",                      DetectSteelSeriesMSIGE66LightBar, STEELSERIES_VID, STEELSERIES_MSI_GE66_LIGHT_BAR_PID, 0, 0xFFC0, 1);
++REGISTER_HID_DETECTOR_IPU("MSI GE66 Raider Keyboard",                       DetectSteelSeriesMSIGE66Keyboard, STEELSERIES_VID, STEELSERIES_MSI_GE66_KEYBOARD_PID,  0, 0xFFC0, 1);
